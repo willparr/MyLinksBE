@@ -1,26 +1,22 @@
 import { ApolloServer, gql } from 'apollo-server';
-import { connectToDb, initMongoClient } from './db';
+import { initMongoClient } from './db';
+import { getUser } from './resolvers/userResolver';
+import { userSchema } from './typeDefs/userSchema';
 require('dotenv').config();
 
-
 const server = new ApolloServer({
-  typeDefs: gql`
-    type Query {
-      hello: String!
-    }
-  `,
+  typeDefs: userSchema,
   resolvers: {
     Query: {
-      hello: () => 'Hey!',
+      user: (parent, args, context) => getUser(parent, args, context),
     },
   },
 });
 
-function startServer(){
+function startServer() {
   server.listen().then(({ url }) => {
     // eslint-disable-next-line no-console
     console.log(`🚀 Server ready at ${url}`);
-    connectToDb();
   });
 }
 
